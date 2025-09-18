@@ -1,0 +1,375 @@
+body {
+  /* background: radial-gradient(circle at 20% 20%, #3b82f6, #1e293b, #0f172a); */
+  background-size: cover;
+  background-attachment: fixed;
+  color: white;
+}
+
+
+.hero-title {
+  font-size: 4em; /* Bigger than fs-1 for hero impact */
+  font-weight: 800;
+  color:blueviolet
+}
+
+#threeD {
+  width: 100%;
+  height: 500px; /* Adjust as needed */
+  border-radius: 20px; /* If you want rounded corners */
+}
+
+.right{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+
+#threeD{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 25%;
+    right: 15%;
+    transform: scale(40%);
+}
+
+
+
+/* Magazine Layout Styles */
+.magazine-article {
+  transition: all 0.3s ease !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.magazine-article:hover {
+  background-color: #fafafa !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+}
+
+.magazine-image-container {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.magazine-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.magazine-article:hover .magazine-image {
+  transform: scale(1.05);
+}
+
+.magazine-content {
+  padding: 0 20px;
+}
+
+.magazine-title {
+  transition: color 0.3s ease !important;
+}
+
+/* Grid Layout Styles */
+.grid-item {
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12px !important;
+}
+
+.grid-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.grid-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.grid-item:hover .grid-image {
+  transform: scale(1.05);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .magazine-content {
+    padding: 20px 0 0 0;
+  }
+  
+  .magazine-image {
+    height: 200px;
+  }
+
+}
+
+@media (max-width: 576px) {
+  .magazine-image {
+    height: 180px;
+  }
+  
+
+  .grid-image-container {
+    height: 160px;
+  }
+}
+
+/* Animation for layout transitions */
+.layout-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.layout-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+
+
+
+
+
+
+
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2rem 4vw;
+  background: blueviolet;
+  color: #fff;
+  flex-wrap: wrap;
+  gap: 2rem;
+  
+}
+
+.footer-left {
+  max-width: 320px;
+}
+
+.blog-name {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  letter-spacing: 1px;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  color: #bdbdbd;
+  margin-bottom: 1.2rem;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.social-icons a {
+  color: #fff;
+  font-size: 1.5rem;
+  transition: color 0.2s;
+}
+
+.social-icons a:hover {
+  color: #150013;
+}
+
+
+
+
+/* CustomNavbar.css */
+
+/* Profile container hover effects */
+.profile-container:hover {
+  background: rgba(138, 43, 226, 0.1) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
+}
+
+.profile-container:hover i {
+  transform: rotate(180deg);
+}
+
+/* Get started button hover effects */
+.get-started-btn:hover {
+  background: rgba(138, 43, 226, 0.9) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4) !important;
+}
+
+/* Profile dropdown menu animations */
+.profile-dropdown .dropdown-menu {
+  animation: dropdownFadeIn 0.3s ease-out forwards;
+  transform-origin: top right;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Dropdown item hover effects */
+.profile-menu .dropdown-item:hover {
+  background: rgba(138, 43, 226, 0.08) !important;
+  color: blueviolet !important;
+  transform: translateX(4px);
+}
+
+.profile-menu .dropdown-item:hover i {
+  transform: scale(1.1);
+}
+
+/* Navbar responsive adjustments */
+@media (max-width: 991.98px) {
+  .custom-navbar {
+    width: 98% !important;
+    margin-top: 1rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  
+  .profile-container {
+    padding: 6px 10px !important;
+  }
+  
+  .profile-dropdown .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+    min-width: 180px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .custom-navbar {
+    width: 100% !important;
+    margin: 0.5rem auto !important;
+    border-radius: 0.75rem !important;
+  }
+  
+  .navbar-collapse {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(138, 43, 226, 0.2);
+  }
+  
+  .profile-dropdown .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: none !important;
+    margin-top: 0.5rem !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .custom-navbar {
+    margin: 0.25rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+.custom-navbar * {
+  transition: all 0.3s ease;
+}
+
+/* Brand logo hover effect */
+.navbar-brand:hover img {
+  transform: rotate(5deg) scale(1.05);
+}
+
+.navbar-brand:hover span {
+  color: rgba(138, 43, 226, 0.8) !important;
+}
+
+/* Mobile menu toggle button styling */
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.25);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28138, 43, 226, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Loading state for profile image */
+.profile-container img {
+  transition: all 0.3s ease;
+}
+
+.profile-container:hover img {
+  transform: scale(1.05);
+  border-color: rgba(138, 43, 226, 0.8) !important;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .custom-navbar *,
+  .profile-container,
+  .get-started-btn,
+  .dropdown-item {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+
+.custom-btn {
+  background-color: blueviolet !important;
+  border: none !important;
+  border-radius: 8px;
+  color: #fff !important;
+  transition: all 0.3s ease;
+}
+
+.custom-btn:hover {
+  background-color: indigo !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(138, 43, 226, 0.4);
+}
+
+.custom-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 6px rgba(138, 43, 226, 0.3);
+}
+
+.custom-btn:disabled {
+  background-color: #b084dc !important;
+  cursor: not-allowed;
+}

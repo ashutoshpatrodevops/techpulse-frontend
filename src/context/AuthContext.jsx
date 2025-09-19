@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   // Check auth once app loads
   useEffect(() => {
     axios
-      .get("http://localhost:8080/users/check-auth", { withCredentials: true })
+      .get(`${import.meta.env.VITE_API_URL}/users/check-auth`, { withCredentials: true })
       .then((res) => {
         if (res.data.isAuth) {
           setAuth(true);
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   // 🔹 Logout function
   const logout = async () => {
     try {
-      await axios.post("http://localhost:8080/users/logout", {}, { withCredentials: true });
+      await axios.post(`${import.meta.env.VITE_API_URL}/users/logout`, {}, { withCredentials: true });
       setAuth(false);
       setUser(null);
       setFlash({ type: "success", message: "Logged out successfully!" });

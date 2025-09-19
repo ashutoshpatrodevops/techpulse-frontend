@@ -16,25 +16,25 @@ const Footer = () => {
               <h2 className="blog-name mb-3" style={{ color: 'blueviolet' }}>TechPulse</h2>
               <p className="tagline mb-4">Your daily dose of tech insights and innovation stories</p>
               <div className="social-icons d-flex gap-3 mb-4">
-                <a href="https://twitter.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Twitter" 
+                <a href="https://x.com/CoderAshu" target="_blank" rel="noopener noreferrer" aria-label="Twitter" 
                    className="text-light" style={{ fontSize: '1.5rem', transition: 'color 0.3s' }}
                    onMouseEnter={(e) => e.target.style.color = 'blueviolet'}
                    onMouseLeave={(e) => e.target.style.color = 'white'}>
                   <FaTwitter />
                 </a>
-                <a href="https://github.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                <a href="https://github.com/ashutoshpatrodevops" target="_blank" rel="noopener noreferrer" aria-label="GitHub"
                    className="text-light" style={{ fontSize: '1.5rem', transition: 'color 0.3s' }}
                    onMouseEnter={(e) => e.target.style.color = 'blueviolet'}
                    onMouseLeave={(e) => e.target.style.color = 'white'}>
                   <FaGithub />
                 </a>
-                <a href="https://linkedin.com/in/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+                <a href="https://www.linkedin.com/in/ashutosh-patro-2054b7239" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
                    className="text-light" style={{ fontSize: '1.5rem', transition: 'color 0.3s' }}
                    onMouseEnter={(e) => e.target.style.color = 'blueviolet'}
                    onMouseLeave={(e) => e.target.style.color = 'white'}>
                   <FaLinkedin />
                 </a>
-                <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
                    className="text-light" style={{ fontSize: '1.5rem', transition: 'color 0.3s' }}
                    onMouseEnter={(e) => e.target.style.color = 'blueviolet'}
                    onMouseLeave={(e) => e.target.style.color = 'white'}>

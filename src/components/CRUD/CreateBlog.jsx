@@ -209,7 +209,7 @@ const CreateBlog = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:8080/blogs", data, {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/blogs`, data, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -12,7 +12,7 @@ const Blogpage = () => {
 
   // Fetch blogs from backend
   useEffect(() => {
-    axios.get("http://localhost:8080/blogs", { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_API_URL}/blogs`, { withCredentials: true })
       .then(res => setBlogs(res.data))
       .catch(err => console.error(err));
   }, []);

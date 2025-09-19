@@ -13,7 +13,7 @@ const CustomNavbar = () => {
   // Check session when navbar loads
   useEffect(() => {
     axios
-      .get("http://localhost:8080/users/check-auth", { withCredentials: true })
+      .get(`${import.meta.env.VITE_API_URL}/users/check-auth`, { withCredentials: true })
       .then((res) => {
         if (res.data.isAuth) {
           setAuth(true);
@@ -29,7 +29,7 @@ const CustomNavbar = () => {
   // Handle logout
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:8080/users/logout", { withCredentials: true });
+      await axios.get(`${import.meta.env.VITE_API_URL}/users/logout`, { withCredentials: true });
       setAuth(false);
       setUser(null);
     } catch (err) {

@@ -147,7 +147,7 @@ const EditBlog = () => {
     const fetchBlog = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(`http://localhost:8080/blogs/${id}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${id}`, {
           withCredentials: true,
         });
         
@@ -263,7 +263,7 @@ const EditBlog = () => {
     }
 
     try {
-      await axios.put(`http://localhost:8080/blogs/${id}`, data, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/blogs/${id}`, data, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

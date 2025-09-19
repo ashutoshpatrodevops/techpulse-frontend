@@ -15,7 +15,7 @@ const Comment = ({ blogId }) => {
     if (!blogId) return;
     const fetchComments = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/blogs/${blogId}/comments`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${blogId}/comments`);
         setComments(res.data);
       } catch (err) {
         showFlash("Failed to load comments", "error");
@@ -30,7 +30,7 @@ const Comment = ({ blogId }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:8080/blogs/${blogId}/comments`,
+        `${import.meta.env.VITE_API_URL}/blogs/${blogId}/comments`,
         { comment: newComment },
         { withCredentials: true }
       );

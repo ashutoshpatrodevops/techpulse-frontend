@@ -18,7 +18,7 @@ const View = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/blogs/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${id}`);
         setBlog(res.data);
         setLikes(res.data.likes?.length || 0);
         setDislikes(res.data.dislikes?.length || 0);
@@ -44,7 +44,7 @@ const View = () => {
     if (!user) return showFlash("Please login to like the blog", "error");
     try {
       const res = await axios.put(
-        `http://localhost:8080/blogs/${id}/like`,
+        `${import.meta.env.VITE_API_URL}/blogs/${id}/like`,
         {},
         { withCredentials: true }
       );
@@ -61,7 +61,7 @@ const View = () => {
     if (!user) return showFlash("Please login to dislike the blog", "error");
     try {
       const res = await axios.put(
-        `http://localhost:8080/blogs/${id}/dislike`,
+        `${import.meta.env.VITE_API_URL}/blogs/${id}/dislike`,
         {},
         { withCredentials: true }
       );
@@ -77,7 +77,7 @@ const View = () => {
   const handleDelete = async () => {
     if (!user) return showFlash("Please login to delete the blog", "error");
     try {
-      await axios.delete(`http://localhost:8080/blogs/${id}`, { withCredentials: true });
+      await axios.delete(`${import.meta.env.VITE_API_URL}/blogs/${id}`, { withCredentials: true });
       showFlash("Blog deleted successfully!", "success");
       navigate("/");
     } catch (err) {

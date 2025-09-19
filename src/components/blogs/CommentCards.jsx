@@ -9,7 +9,7 @@ const CommentCards = ({ comments, setComments, blogId }) => {
   // Delete a comment
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/blogs/${blogId}/comments/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/blogs/${blogId}/comments/${id}`, {
         withCredentials: true,
       });
       setComments(comments.filter((c) => c._id !== id));
@@ -22,7 +22,7 @@ const CommentCards = ({ comments, setComments, blogId }) => {
   const handleLike = async (id) => {
     try {
       const res = await axios.put(
-        `http://localhost:8080/blogs/${blogId}/comments/${id}/like`,
+        `${import.meta.env.VITE_API_URL}/blogs/${blogId}/comments/${id}/like`,
         {},
         { withCredentials: true }
       );
@@ -38,7 +38,7 @@ const CommentCards = ({ comments, setComments, blogId }) => {
   const handleDislike = async (id) => {
     try {
       const res = await axios.put(
-        `http://localhost:8080/blogs/${blogId}/comments/${id}/dislike`,
+        `${import.meta.env.VITE_API_URL}/blogs/${blogId}/comments/${id}/dislike`,
         {},
         { withCredentials: true }
       );

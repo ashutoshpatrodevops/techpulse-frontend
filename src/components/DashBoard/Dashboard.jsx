@@ -16,7 +16,7 @@ export const Dashboard = forwardRef((props, ref) => {
       setLoading(true);
       setError(null);
       const res = await axios.get(
-        `http://localhost:8080/users/${user._id}/dashboard`,
+        `${import.meta.env.VITE_API_URL}/users/${user._id}/dashboard`,
         { withCredentials: true }
       );
       setData(res.data);

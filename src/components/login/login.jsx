@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8080/users/login",
+        `${import.meta.env.VITE_API_URL}/users/login`,
         { username, password },
         { withCredentials: true }
       );
@@ -91,7 +91,7 @@ const Login = () => {
 
             <div className="d-flex justify-content-center mt-3 gap-3">
               <a
-                href="http://localhost:8080/users/auth/google"
+                href={`${import.meta.env.VITE_API_URL}/users/auth/google`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "blueviolet", fontSize: "1.5rem" }}

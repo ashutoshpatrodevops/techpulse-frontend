@@ -282,10 +282,12 @@ export const Dashboard = forwardRef((props, ref) => {
                     <div className="text-center py-4">
                       <i className="fas fa-pen-alt fa-2x fa-md-3x text-muted mb-3"></i>
                       <p className="text-muted small">No blogs yet. Start writing your first blog!</p>
+                      <Link to="/create" className="text-decoration-none"></Link>
                       <button className="btn btn-primary btn-sm">
                         <i className="fas fa-plus me-2"></i>
                         Create Blog
                       </button>
+                      <Link/>
                     </div>
                   ) : (
                     <div className="list-group list-group-flush">

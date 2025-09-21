@@ -1,3 +1,6 @@
+*{
+  font-family: "montserrat";
+}
 body {
   /* background: radial-gradient(circle at 20% 20%, #3b82f6, #1e293b, #0f172a); */
   background-size: cover;

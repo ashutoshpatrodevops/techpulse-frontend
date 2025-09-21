@@ -199,15 +199,15 @@ const Hero = () => {
         </div>
         
         {/* 3D Animation Section (commented out) */}
-        {/* <div className="col-lg-6 col-md-6 col-12 right d-none d-md-block text-center p-lg-4 p-md-3 p-3">
-          <spline-viewer 
-            id="threeD" 
-            url="https://prod.spline.design/nDEfauaOM7PPE5yz/scene.splinecode" 
-            loading="lazy"
-            style={{width: "100%", height: "400px"}}
-          >
-          </spline-viewer>
-        </div> */}
+       <div className="col-lg-6 col-md-6 col-12 right text-center p-lg-4 p-md-3 p-3">
+  <img 
+    src="/heroside.svg" 
+    alt="Hero Side" 
+    className="img-fluid"
+    style={{ maxWidth: "90%", height: "auto" }} 
+  />
+</div>
+
       </div>
     </div>
   );

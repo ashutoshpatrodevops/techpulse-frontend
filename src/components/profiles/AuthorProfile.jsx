@@ -11,17 +11,22 @@ const AuthorProfile = () => {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({ bio: '', avatar: null });
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/profile/${encodeURIComponent(username)}`);
-        setProfile({
+        const nextProfile = {
           ...response.data,
           blogs: Array.isArray(response.data.blogs) ? response.data.blogs : [],
           stats: response.data.stats || { articles: 0, followers: 0, following: 0 },
-        });
+        };
+        setProfile(nextProfile);
+        setFormData({ bio: nextProfile.user?.bio || '', avatar: null });
       } catch (err) {
         setError(err.response?.data?.error || 'Profile could not be loaded.');
       } finally {
@@ -51,6 +56,23 @@ const AuthorProfile = () => {
     }
   };
 
+  const saveProfile = async (event) => {
+    event.preventDefault();
+    try {
+      setSaving(true);
+      const payload = new FormData();
+      payload.append('bio', formData.bio);
+      if (formData.avatar) payload.append('avatar', formData.avatar);
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/users/profile`, payload, { withCredentials: true });
+      setProfile((current) => ({ ...current, user: response.data.user }));
+      setEditing(false);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not update your profile.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) return <main className="tp-profile__state">Loading profile...</main>;
   if (error && !profile) return <main className="tp-profile__state tp-profile__state--error">{error}</main>;
 
@@ -62,10 +84,20 @@ const AuthorProfile = () => {
           <div className="tp-profile__avatar">{profile.user.avatar ? <img src={profile.user.avatar} alt="" /> : profile.user.username.charAt(0).toUpperCase()}</div>
           <div className="tp-profile__identity"><p className="tp-profile__eyebrow">TechPulse author</p><h1>{profile.user.username}</h1><p>{profile.user.bio || 'Sharing ideas, experiments, and lessons from the world of technology.'}</p></div>
           <div className="tp-profile__actions">
+            {isOwnProfile && <button className="tp-profile__follow" type="button" onClick={() => setEditing((current) => !current)}>{editing ? 'Close editor' : 'Edit profile'}</button>}
             {!isOwnProfile && <button className={`tp-profile__follow${profile.isFollowing ? ' is-following' : ''}`} type="button" onClick={toggleFollow} disabled={!user || busy}>{profile.isFollowing ? 'Following' : 'Follow'}</button>}
             {!user && <Link className="tp-profile__login" to="/login">Log in to follow</Link>}
           </div>
         </section>
+
+        {editing && isOwnProfile && (
+          <form className="tp-profile__editor" onSubmit={saveProfile}>
+            <div><p className="tp-profile__eyebrow">Edit your profile</p><h2>Tell the community who you are.</h2></div>
+            <label>Bio<textarea value={formData.bio} maxLength={280} rows={4} onChange={(event) => setFormData((current) => ({ ...current, bio: event.target.value }))} placeholder="What do you build or care about?" /></label>
+            <label>Avatar<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setFormData((current) => ({ ...current, avatar: event.target.files?.[0] || null }))} /></label>
+            <div className="tp-profile__editor-foot"><small>{formData.bio.length}/280</small><button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</button></div>
+          </form>
+        )}
 
         <section className="tp-profile__stats" aria-label="Author stats">
           <span><strong>{profile.stats.articles}</strong> articles</span>

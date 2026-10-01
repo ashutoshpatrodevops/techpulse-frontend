@@ -13,9 +13,9 @@ const TOPICS = [
 // Placeholder articles. Pass real ones as <Hero articles={...} /> once your
 // blogs API is wired in: { id, tag, title, readTime, to }.
 const SAMPLE_ARTICLES = [
-  { id: 1, tag: 'AI', title: 'What AI agents can and can’t do yet', readTime: 6 },
-  { id: 2, tag: 'Generative AI', title: 'Prompting is turning into software engineering', readTime: 5 },
-  { id: 3, tag: 'Software development', title: 'Why small teams are shipping faster with typed APIs', readTime: 4 },
+  { id: 1, tag: 'Devops', title: 'Devops Your way', readTime: 6 },
+  { id: 2, tag: 'Software', title: 'Launching Kermedix', readTime: 5 },
+  { id: 3, tag: 'Software development', title: 'Kermedix system breakdown by Ashutosh', readTime: 4 },
 ];
 
 const EMAILJS_CONFIG = {

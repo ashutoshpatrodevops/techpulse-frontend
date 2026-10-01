@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { FaArrowLeft, FaEdit, FaHeart, FaRegHeart, FaThumbsDown, FaTrash } from 'react-icons/fa';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import { AuthContext } from '../../context/AuthContext';
 import { useFlash } from '../../context/FlashContext';
-import DOMPurify from 'dompurify';
+import './View.css';
+
+const formatDate = (value) => new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
 const View = ({ blog: initialBlog }) => {
   const { user } = useContext(AuthContext);
@@ -12,156 +15,114 @@ const View = ({ blog: initialBlog }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(initialBlog || null);
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
+  const [likes, setLikes] = useState(initialBlog?.likes?.length || 0);
+  const [dislikes, setDislikes] = useState(initialBlog?.dislikes?.length || 0);
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+  const [reactionPending, setReactionPending] = useState(false);
+
+  const syncReactionState = (article) => {
+    const userId = user?._id || user?.id;
+    setLikes(article.likes?.length || 0);
+    setDislikes(article.dislikes?.length || 0);
+    setLiked(Boolean(userId && article.likes?.some((like) => like.toString() === userId.toString())));
+    setDisliked(Boolean(userId && article.dislikes?.some((dislike) => dislike.toString() === userId.toString())));
+  };
 
   useEffect(() => {
     if (initialBlog) {
       setBlog(initialBlog);
+      syncReactionState(initialBlog);
       return;
     }
 
     const fetchBlog = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${id}`);
-        setBlog(res.data);
-        setLikes(res.data.likes?.length || 0);
-        setDislikes(res.data.dislikes?.length || 0);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${id}`);
+        setBlog(response.data);
+        syncReactionState(response.data);
       } catch (err) {
         console.error(err);
-        showFlash({ type: "error", message: "Failed to load blog." });
+        showFlash('Failed to load article.', 'error');
       }
     };
     fetchBlog();
-  }, [id, initialBlog]);
+  }, [id, initialBlog, user]);
 
-  if (!blog) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: "60vh" }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
-  const handleLike = async () => {
-    if (!user) return showFlash("Please login to like the blog", "error");
-    try {
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/blogs/${blog._id}/like`,
-        {},
-        { withCredentials: true }
-      );
-      setLikes(res.data.likes.length);
-      setDislikes(res.data.dislikes.length);
-      showFlash("You liked this blog!", "success");
-    } catch (err) {
-      console.error(err);
-      showFlash("Something went wrong while liking.", "error");
+  const react = async (type) => {
+    if (!user) return showFlash('Please log in to react to an article.', 'error');
+    if (!blog || reactionPending) return;
+    if (blog.owner?._id?.toString() === (user._id || user.id)?.toString()) {
+      return showFlash('Authors cannot react to their own articles.', 'error');
     }
-  };
 
-  const handleDislike = async () => {
-    if (!user) return showFlash("Please login to dislike the blog", "error");
+    const previous = { likes, dislikes, liked, disliked };
+    const nextActive = type === 'like' ? !liked : !disliked;
+    setReactionPending(true);
+    if (type === 'like') {
+      setLiked(nextActive);
+      setLikes((count) => Math.max(0, count + (nextActive ? 1 : -1)));
+      if (nextActive && disliked) { setDisliked(false); setDislikes((count) => Math.max(0, count - 1)); }
+    } else {
+      setDisliked(nextActive);
+      setDislikes((count) => Math.max(0, count + (nextActive ? 1 : -1)));
+      if (nextActive && liked) { setLiked(false); setLikes((count) => Math.max(0, count - 1)); }
+    }
+
     try {
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/blogs/${blog._id}/dislike`,
-        {},
-        { withCredentials: true }
-      );
-      setLikes(res.data.likes.length);
-      setDislikes(res.data.dislikes.length);
-      showFlash("You disliked this blog!", "success");
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/blogs/${blog._id}/${type}`, {}, { withCredentials: true });
+      syncReactionState(response.data);
     } catch (err) {
-      console.error(err);
-      showFlash("Something went wrong while disliking.", "error");
+      setLikes(previous.likes); setDislikes(previous.dislikes); setLiked(previous.liked); setDisliked(previous.disliked);
+      showFlash(err.response?.data?.error || 'Could not update your reaction.', 'error');
+    } finally {
+      setReactionPending(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!user) return showFlash("Please login to delete the blog", "error");
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/blogs/${blog._id}`, { withCredentials: true });
-      showFlash("Blog deleted successfully!", "success");
-      navigate("/");
+      showFlash('Article deleted successfully.', 'success');
+      navigate('/blogs');
     } catch (err) {
-      console.error(err);
-      showFlash("Failed to delete blog, our server are taking a deep breath", "error");
+      showFlash('Failed to delete the article.', 'error');
     }
   };
 
-  const handleEdit = () => {
-    navigate(`/edit/${blog._id}`);
-  };
+  if (!blog) return <main className="tp-reader__state">Loading article...</main>;
+  const isOwner = user && blog.owner?._id?.toString() === (user._id || user.id)?.toString();
 
   return (
-    <div className="container-fluid">
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-11 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
-          {/* Title & Author */}
-          <div className="row align-items-start mb-4 px-2 px-sm-3 mt-4 mt-sm-5">
-            <div className="col-12 col-md-8 mb-3 mb-md-0">
-              <h2 className="fw-bold mb-0 fs-1 fs-sm-2 fs-md-1">{blog.heading}</h2>
+    <main className="tp-reader">
+      <div className="tp-reader__shell">
+        <Link className="tp-reader__back" to="/blogs"><FaArrowLeft aria-hidden="true" /> Back to articles</Link>
+        <article>
+          <header className="tp-reader__hero">
+            <div className="tp-reader__eyebrow"><span>{blog.genre}</span>{blog.tags?.slice(0, 3).map((tag) => <span key={tag}>#{tag}</span>)}</div>
+            <h1>{blog.heading}</h1>
+            <p className="tp-reader__description">{blog.shortDescription}</p>
+            <div className="tp-reader__byline">
+              <span className="tp-reader__avatar">{blog.owner?.username?.charAt(0).toUpperCase() || 'T'}</span>
+              <div><Link to={`/profile/${encodeURIComponent(blog.owner?.username || '')}`}>{blog.owner?.username || 'TechPulse author'}</Link><small>Published {formatDate(blog.date)}</small></div>
             </div>
-            <div className="col-12 col-md-4 text-start text-md-end">
-              <div className="fw-semibold">{blog.owner?.username}</div>
-              <small className="text-muted">
-                Posted on {new Date(blog.date).toLocaleDateString()}
-              </small>
-            </div>
-          </div>
+          </header>
 
-          {/* Content */}
-          <div className="row px-2 px-sm-3 mt-4 mt-sm-5">
-            <div className="col-12">
-              <div
-                className="blog-content"
-                dangerouslySetInnerHTML={{ 
-                  __html: DOMPurify.sanitize(blog.content, {
-                    ALLOWED_TAGS: [
-                      'h1','h2','h3','h4','h5','h6',
-                      'p','br','strong','b','em','i','u','s',
-                      'ol','ul','li','blockquote','pre','code','a'
-                    ],
-                    ALLOWED_ATTR: ['href','target','rel'],
-                    ALLOWED_URI_REGEXP: /^https?:\/\//, 
-                  })
-                }}
-              />
-            </div>
-          </div>
+          {blog.image && <img className="tp-reader__cover" src={blog.image} alt="" onError={(event) => { event.currentTarget.style.display = 'none'; }} />}
 
-          {/* Like/Dislike Buttons */}
-          <div className="d-flex flex-column flex-sm-row justify-content-start align-items-start align-items-sm-center p-2 p-sm-3 mt-3 gap-3 gap-sm-4">
-            <div className="d-flex align-items-center gap-3">
-              <button className="btn btn-outline-primary d-flex align-items-center gap-2 px-3 py-2" onClick={handleLike}>
-                <FaThumbsUp /> 
-                <span>{likes}</span>
-              </button>
-
-              <button className="btn btn-outline-danger d-flex align-items-center gap-2 px-3 py-2" onClick={handleDislike}>
-                <FaThumbsDown /> 
-                <span>{dislikes}</span>
-              </button>
-            </div>
-
-            {user && blog.owner?._id === user._id && (
-              <div className="d-flex align-items-center gap-2">
-                <button className="btn btn-warning px-3 py-2" onClick={handleEdit}>
-                  <span className="d-none d-sm-inline">Edit</span>
-                  <span className="d-inline d-sm-none">Edit</span>
-                </button>
-                <button className="btn btn-danger px-3 py-2" onClick={handleDelete}>
-                  <span className="d-none d-sm-inline">Delete</span>
-                  <span className="d-inline d-sm-none">Del</span>
-                </button>
+          <div className="tp-reader__layout">
+            <div className="tp-reader__content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content, { ALLOWED_TAGS: ['h1','h2','h3','h4','h5','h6','p','br','strong','b','em','i','u','s','ol','ul','li','blockquote','pre','code','a'], ALLOWED_ATTR: ['href','target','rel'], ALLOWED_URI_REGEXP: /^https?:\/\// }) }} />
+            <aside className="tp-reader__rail">
+              <div className="tp-reader__reactions" aria-label="Article reactions">
+                <button className={liked ? 'is-active' : ''} type="button" onClick={() => react('like')} disabled={reactionPending || Boolean(isOwner)} title={isOwner ? 'Authors cannot react to their own articles' : 'Like article'}>{liked ? <FaHeart /> : <FaRegHeart />}<span>{likes}</span></button>
+                <button className={disliked ? 'is-active is-negative' : ''} type="button" onClick={() => react('dislike')} disabled={reactionPending || Boolean(isOwner)} title={isOwner ? 'Authors cannot react to their own articles' : 'Dislike article'}><FaThumbsDown /><span>{dislikes}</span></button>
               </div>
-            )}
+              {isOwner && <div className="tp-reader__owner-actions"><Link to={`/edit/${blog._id}`}><FaEdit /> Edit</Link><button type="button" onClick={handleDelete}><FaTrash /> Delete</button></div>}
+            </aside>
           </div>
-        </div>
+        </article>
       </div>
-    </div>
+    </main>
   );
 };
 

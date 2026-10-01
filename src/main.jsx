@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import {BrowserRouter,Routes,Route} from "react-router-dom"
+import {BrowserRouter,Routes,Route,useLocation} from "react-router-dom"
 import App from './App.jsx'
 import Homepage from './components/landingPage/Homepage.jsx'
 import Signup from './components/login/Signup.jsx'
@@ -18,17 +18,27 @@ import { FlashProvider } from "./context/FlashContext.jsx";
 import {Dashboard} from "./components/DashBoard/Dashboard.jsx"
 import AuthorProfile from './components/profiles/AuthorProfile.jsx'
 import LegalPage from './components/legal/LegalPage.jsx'
+import AccountSettings from './components/settings/AccountSettings.jsx'
+
+const ArticlePageChrome = () => {
+  const { pathname } = useLocation();
+  const isArticlePage = /^\/blog\/[^/]+$/.test(pathname) || /^\/blogs\/[^/]+$/.test(pathname);
+
+  return isArticlePage ? null : <CustomNavbar />;
+};
+
 createRoot(document.getElementById('root')).render(
   <FlashProvider>
     <BrowserRouter>
     <AuthProvider>
-    <CustomNavbar/>
+    <ArticlePageChrome />
       <Routes>
             <Route path='/' element={<Homepage/>}></Route>
             <Route path="/signup" element={<Signup/>}></Route>
             <Route path='/login' element={<Login/>}></Route>
             <Route path='/privacy' element={<LegalPage type="privacy"/>}></Route>
             <Route path='/terms' element={<LegalPage type="terms"/>}></Route>
+            <Route path='/settings' element={<ProtectedRoute><AccountSettings/></ProtectedRoute>}></Route>
             <Route path='/profile/:username' element={<AuthorProfile/>}></Route>
             <Route path='/blogs' element={<Blogpage/>}></Route>
             <Route path='/blog/:slug' element={<Compblog/>}></Route>

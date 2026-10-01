@@ -3,6 +3,7 @@ import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import { useFlash } from "../../context/FlashContext";
 import CommentCards from "./CommentCards";
+import './Comments.css';
 
 const Comment = ({ blogId }) => {
   const { user } = useContext(AuthContext);
@@ -44,34 +45,18 @@ const Comment = ({ blogId }) => {
   };
 
   return (
-    <div className="container py-4 p-5">
-      <h2 className="mb-4 text-center text-md-start">Comment your views</h2>
-
-      <form onSubmit={handleSubmit} className="row g-3">
-        {/* Textarea takes full width */}
-        <div className="col-12">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write your comment..."
-            className="form-control"
-            rows="3"
-          />
+    <section className="tp-comments">
+      <div className="tp-comments__shell">
+        <div className="tp-comments__composer">
+          <div><p className="tp-comments__eyebrow">Join the discussion</p><h2>What do you think?</h2></div>
+          <form onSubmit={handleSubmit}>
+            <textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder={user ? 'Share a thoughtful response...' : 'Log in to join the conversation...'} rows="4" disabled={!user} maxLength={2000} />
+            <div className="tp-comments__composer-foot"><small>{newComment.length}/2000</small><button type="submit" disabled={!user || !newComment.trim()}>Post comment</button></div>
+          </form>
         </div>
-
-        {/* Button centers on mobile, aligns left on desktop */}
-        <div className="col-12 d-flex justify-content-center justify-content-md-start">
-  <button type="submit" className="btn custom-btn px-4 py-2 fw-semibold shadow-sm">
-    Submit
-  </button>
-</div>
-      </form>
-
-      {/* Comments section */}
-      <div className="mt-5">
         <CommentCards comments={comments} setComments={setComments} blogId={blogId} />
       </div>
-    </div>
+    </section>
   );
 };
 

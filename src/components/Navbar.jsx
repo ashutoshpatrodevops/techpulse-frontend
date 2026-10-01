@@ -275,6 +275,16 @@ const CustomNavbar = () => {
                     Dashboard
                   </Dropdown.Item>
 
+                  <Dropdown.Item
+                    as={Link}
+                    to="/settings"
+                    className="d-flex align-items-center py-2"
+                    style={{ color: "#333", textDecoration: "none", fontSize: "0.9rem" }}
+                  >
+                    <i className="fas fa-cog me-3" style={{ color: "blueviolet", width: "16px" }}></i>
+                    Account settings
+                  </Dropdown.Item>
+
                   <Dropdown.Divider style={{ borderColor: "rgba(138, 43, 226, 0.2)" }} />
 
                   {/* Logout Button */}
@@ -399,6 +409,16 @@ const CustomNavbar = () => {
                       >
                         <i className="fas fa-tachometer-alt me-3" style={{ color: "blueviolet", width: "16px" }}></i>
                         Dashboard
+                      </Dropdown.Item>
+
+                      <Dropdown.Item
+                        as={Link}
+                        to="/settings"
+                        className="d-flex align-items-center py-2"
+                        style={{ color: "#333", textDecoration: "none", fontSize: "0.9rem" }}
+                      >
+                        <i className="fas fa-cog me-3" style={{ color: "blueviolet", width: "16px" }}></i>
+                        Account settings
                       </Dropdown.Item>
 
                       <Dropdown.Divider style={{ borderColor: "rgba(138, 43, 226, 0.2)" }} />

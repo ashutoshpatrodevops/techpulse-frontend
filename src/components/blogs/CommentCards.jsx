@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { FaThumbsUp, FaThumbsDown, FaTrash } from "react-icons/fa";
+import { FaRegComment, FaThumbsUp, FaThumbsDown, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -51,37 +51,24 @@ const CommentCards = ({ comments, setComments, blogId }) => {
   };
 
   return (
-    <div>
-      <h3 className="mb-3">All Comments</h3>
+    <div className="tp-comment-list">
+      <div className="tp-comment-list__head"><h3>Community responses</h3><span><FaRegComment /> {comments?.length || 0}</span></div>
       {!comments || comments.length === 0 ? (
-        <p className="text-muted">No comments yet. Be the first to comment!</p>
+        <div className="tp-comment-list__empty"><FaRegComment /><p>No comments yet. Be the first to add your perspective.</p></div>
       ) : (
         comments.map((comment) => (
-          <div
+          <article
             key={comment._id}
-            className="p-3 mb-3 border rounded d-flex justify-content-between align-items-start"
+            className="tp-comment-card"
           >
-            <div>
-              <h6 className="mb-1">{comment.author?.username || "Anonymous"}</h6>
-              <p className="mb-2">{comment.comment}</p>
-              <div className="d-flex gap-3">
-                <span onClick={() => handleLike(comment._id)} style={{ cursor: "pointer" }}>
-                  <FaThumbsUp className="me-1" />{comment.likes?.length || 0}
-                </span>
-                <span onClick={() => handleDislike(comment._id)} style={{ cursor: "pointer" }}>
-                  <FaThumbsDown className="me-1" /> {comment.dislikes?.length || 0}
-                </span>
+            <div className="tp-comment-card__top"><div className="tp-comment-card__author"><span>{comment.author?.username?.charAt(0).toUpperCase() || 'A'}</span><strong>{comment.author?.username || "Anonymous"}</strong></div><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</small></div>
+            <p className="tp-comment-card__body">{comment.comment}</p>
+            <div className="tp-comment-card__actions">
+                <button type="button" onClick={() => handleLike(comment._id)}><FaThumbsUp /> {comment.likes?.length || 0}</button>
+                <button type="button" onClick={() => handleDislike(comment._id)}><FaThumbsDown /> {comment.dislikes?.length || 0}</button>
+                {user && (comment.author?._id === user._id || comment.author?._id === user.id) && <button className="is-delete" type="button" onClick={() => handleDelete(comment._id)}><FaTrash /> Delete</button>}
               </div>
-            </div>
-            {user && comment.author?._id === user._id && (
-              <button
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => handleDelete(comment._id)}
-              >
-                <FaTrash />
-              </button>
-            )}
-          </div>
+          </article>
         ))
       )}
     </div>

@@ -12,6 +12,7 @@ import { useFlash } from "../../context/FlashContext";
 import { useNavigate } from "react-router-dom";
 import { Editor } from '@tinymce/tinymce-react'; 
 import DOMPurify from 'dompurify'; 
+import './CreateBlog.css';
 const CreateBlog = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -21,6 +22,7 @@ const CreateBlog = () => {
   const [formData, setFormData] = useState({
     heading: "",
     category: "",
+    tags: "",
     shortDescription: "",
     content: "",
     image: null,
@@ -199,6 +201,7 @@ const CreateBlog = () => {
     const data = new FormData();
     data.append("heading", formData.heading.trim());
     data.append("genre", formData.category.trim());
+    data.append("tags", formData.tags);
     data.append("shortDescription", formData.shortDescription.trim());
     
     // 🛡️ SECURITY: Send sanitized content (server should sanitize again)
@@ -209,7 +212,7 @@ const CreateBlog = () => {
     }
 
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/blogs`, data, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/blogs`, data, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -219,7 +222,7 @@ const CreateBlog = () => {
       });
       
       showFlash(`Blog Created Successfully`, "success");
-      setFormData({ heading: "", category: "", shortDescription: "", content: "", image: null });
+      setFormData({ heading: "", category: "", tags: "", shortDescription: "", content: "", image: null });
       setErrors({});
       navigate("/");
       
@@ -243,10 +246,19 @@ const CreateBlog = () => {
   };
 
   return (
-    <div className="container-fluid px-2 px-md-4 mt-3 py-3 py-md-5">
-      <div className="row justify-content-center">
-        <div className="col-12 col-lg-10 col-xl-8">
-          <h3 className="mb-4 text-center text-md-start">Create Your New Blog</h3>
+    <main className="tp-create">
+      <div className="tp-create__shell">
+        <header className="tp-create__header">
+          <div>
+            <p className="tp-create__eyebrow">Creator desk</p>
+            <h1>Publish an idea worth sharing.</h1>
+            <p>Shape your next article for the TechPulse community.</p>
+          </div>
+          <div className="tp-create__author"><span>{user?.username?.charAt(0).toUpperCase() || 'T'}</span><div><small>Publishing as</small><strong>{user?.username || 'TechPulse author'}</strong></div></div>
+        </header>
+
+        <div className="tp-create__layout">
+          <section className="tp-create__form-panel">
           
           {/* 🛡️ SECURITY: Show validation errors */}
           {Object.keys(errors).length > 0 && (
@@ -302,6 +314,18 @@ const CreateBlog = () => {
                 </Form.Text>
               </Form.Group>
             </Row>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Tags</Form.Label>
+              <Form.Control
+                name="tags"
+                placeholder="e.g. ai, javascript, cloud"
+                value={formData.tags}
+                onChange={handleChange}
+                maxLength={320}
+              />
+              <Form.Text className="text-muted">Separate tags with commas, up to 8 tags.</Form.Text>
+            </Form.Group>
 
             <Form.Group className="mb-4">
               <Form.Label>Short Description</Form.Label>
@@ -380,12 +404,12 @@ const CreateBlog = () => {
                 disabled={isSubmitting || Object.keys(errors).length > 0}
                 size="large"
                 sx={{
-                  background: "linear-gradient(45deg, #8A2BE2 30%, #9370DB 90%)",
+                  background: "#7c3aed",
                   px: 4,
                   py: 1.5,
                   fontSize: '1.1rem',
                   '&:hover': {
-                    background: "linear-gradient(45deg, #7B68EE 30%, #8A2BE2 90%)",
+                    background: "#5b21b6",
                   }
                 }}
               >
@@ -393,9 +417,24 @@ const CreateBlog = () => {
               </Button2>
             </div>
           </Form>
+          </section>
+
+          <aside className="tp-create__aside">
+            <div className="tp-create__aside-card">
+              <p className="tp-create__eyebrow">Before you publish</p>
+              <h2>Make it useful.</h2>
+              <ul>
+                <li><i className="fas fa-check" aria-hidden="true" />Lead with a clear idea</li>
+                <li><i className="fas fa-check" aria-hidden="true" />Give readers a useful takeaway</li>
+                <li><i className="fas fa-check" aria-hidden="true" />Use tags people can discover</li>
+                <li><i className="fas fa-check" aria-hidden="true" />Check your links and formatting</li>
+              </ul>
+            </div>
+            <div className="tp-create__aside-note"><i className="fas fa-shield-alt" aria-hidden="true" /><span>Your content is sanitized before it is published.</span></div>
+          </aside>
         </div>
-      </div>
-    </div>
+        </div>
+    </main>
   );
 };
 

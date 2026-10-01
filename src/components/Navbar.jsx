@@ -262,7 +262,7 @@ const CustomNavbar = () => {
                   {/* Dashboard Link */}
                   <Dropdown.Item
                     as={Link}
-                    to={`/users/${user?._id}/dashboard`}
+                    to={`/users/${encodeURIComponent(user?.username || '')}/dashboard`}
                     className="d-flex align-items-center py-2"
                     style={{
                       color: "#333",
@@ -388,7 +388,7 @@ const CustomNavbar = () => {
                       {/* Dashboard Link */}
                       <Dropdown.Item
                         as={Link}
-                        to={`/users/${user?._id}/dashboard`}
+                        to={`/users/${encodeURIComponent(user?.username || '')}/dashboard`}
                         className="d-flex align-items-center py-2"
                         style={{
                           color: "#333",

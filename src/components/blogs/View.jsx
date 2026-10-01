@@ -6,16 +6,21 @@ import { AuthContext } from '../../context/AuthContext';
 import { useFlash } from '../../context/FlashContext';
 import DOMPurify from 'dompurify';
 
-const View = () => {
+const View = ({ blog: initialBlog }) => {
   const { user } = useContext(AuthContext);
   const { showFlash } = useFlash();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [blog, setBlog] = useState(null);
+  const [blog, setBlog] = useState(initialBlog || null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
 
   useEffect(() => {
+    if (initialBlog) {
+      setBlog(initialBlog);
+      return;
+    }
+
     const fetchBlog = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${id}`);
@@ -28,7 +33,7 @@ const View = () => {
       }
     };
     fetchBlog();
-  }, [id]);
+  }, [id, initialBlog]);
 
   if (!blog) {
     return (
@@ -44,7 +49,7 @@ const View = () => {
     if (!user) return showFlash("Please login to like the blog", "error");
     try {
       const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/blogs/${id}/like`,
+        `${import.meta.env.VITE_API_URL}/blogs/${blog._id}/like`,
         {},
         { withCredentials: true }
       );
@@ -61,7 +66,7 @@ const View = () => {
     if (!user) return showFlash("Please login to dislike the blog", "error");
     try {
       const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/blogs/${id}/dislike`,
+        `${import.meta.env.VITE_API_URL}/blogs/${blog._id}/dislike`,
         {},
         { withCredentials: true }
       );
@@ -77,7 +82,7 @@ const View = () => {
   const handleDelete = async () => {
     if (!user) return showFlash("Please login to delete the blog", "error");
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/blogs/${id}`, { withCredentials: true });
+      await axios.delete(`${import.meta.env.VITE_API_URL}/blogs/${blog._id}`, { withCredentials: true });
       showFlash("Blog deleted successfully!", "success");
       navigate("/");
     } catch (err) {
@@ -87,7 +92,7 @@ const View = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/edit/${id}`);
+    navigate(`/edit/${blog._id}`);
   };
 
   return (

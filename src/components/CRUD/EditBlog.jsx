@@ -23,6 +23,7 @@ const EditBlog = () => {
   const [formData, setFormData] = useState({
     heading: "",
     genre: "",
+    tags: "",
     shortDescription: "",
     content: "",
     image: null,
@@ -154,6 +155,7 @@ const EditBlog = () => {
         const blogData = {
           heading: res.data.heading || "",
           genre: res.data.genre || "",
+          tags: (res.data.tags || []).join(", "),
           shortDescription: res.data.shortDescription || "",
           content: res.data.content || "",
           image: null,
@@ -256,6 +258,7 @@ const EditBlog = () => {
     const data = new FormData();
     data.append("heading", formData.heading.trim());
     data.append("genre", formData.genre.trim());
+    data.append("tags", formData.tags);
     data.append("shortDescription", formData.shortDescription.trim());
     data.append("content", formData.content);
     if (formData.image) {
@@ -380,6 +383,18 @@ const EditBlog = () => {
                 </Form.Text>
               </Form.Group>
             </Row>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Tags</Form.Label>
+              <Form.Control
+                name="tags"
+                value={formData.tags}
+                onChange={handleChange}
+                placeholder="e.g. ai, javascript, cloud"
+                maxLength={320}
+              />
+              <Form.Text className="text-muted">Separate tags with commas, up to 8 tags.</Form.Text>
+            </Form.Group>
 
             <Form.Group className="mb-4">
               <Form.Label>Short Description</Form.Label>

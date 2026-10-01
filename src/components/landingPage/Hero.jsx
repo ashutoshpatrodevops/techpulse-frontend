@@ -1,215 +1,195 @@
-import React, { useState, useRef } from 'react';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import SendIcon from '@mui/icons-material/Send';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Form from 'react-bootstrap/Form';
-import Alert from 'react-bootstrap/Alert';
-import emailjs from '@emailjs/browser'; // Install: npm install @emailjs/browser
+import emailjs from '@emailjs/browser';
+import './Hero.css';
 
-const Hero = () => {
+const TOPICS = [
+  'Artificial intelligence',
+  'Generative AI',
+  'Software development',
+  'Future tech',
+];
+
+// Placeholder articles. Pass real ones as <Hero articles={...} /> once your
+// blogs API is wired in: { id, tag, title, readTime, to }.
+const SAMPLE_ARTICLES = [
+  { id: 1, tag: 'AI', title: 'What AI agents can and can’t do yet', readTime: 6 },
+  { id: 2, tag: 'Generative AI', title: 'Prompting is turning into software engineering', readTime: 5 },
+  { id: 3, tag: 'Software development', title: 'Why small teams are shipping faster with typed APIs', readTime: 4 },
+];
+
+const EMAILJS_CONFIG = {
+  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+};
+
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const ArrowIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+);
+
+const MailIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 7l9 6 9-6" />
+  </svg>
+);
+
+const Hero = ({ articles = SAMPLE_ARTICLES }) => {
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null); // 'success', 'error', null
-  const [errorMessage, setErrorMessage] = useState('');
-  const formRef = useRef();
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [message, setMessage] = useState('');
 
-  // 🔧 EmailJS Configuration
-  const EMAILJS_CONFIG = {
-    serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,      
-    templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,      
-    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY    
-  };
-
-  // 📧 Email validation
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // 📨 Handle newsletter subscription
   const handleSubscribe = async (e) => {
     e.preventDefault();
-    
-    // Reset previous states
-    setSubscriptionStatus(null);
-    setErrorMessage('');
 
-    // Validate email
     if (!email.trim()) {
-      setSubscriptionStatus('error');
-      setErrorMessage('Please enter your email address');
+      setStatus('error');
+      setMessage('Enter your email address.');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setStatus('error');
+      setMessage('Enter a valid email address, like name@example.com.');
       return;
     }
 
-    if (!validateEmail(email)) {
-      setSubscriptionStatus('error');
-      setErrorMessage('Please enter a valid email address');
-      return;
-    }
-
-    setIsSubmitting(true);
+    setStatus('sending');
+    setMessage('');
 
     try {
-      // 📧 EmailJS template parameters
-      const templateParams = {
-        user_email: email,
-        user_name: email.split('@')[0], // Extract name from email (before @)
-        subscription_date: new Date().toLocaleDateString(),
-        subscription_time: new Date().toLocaleTimeString(),
-        message: `New newsletter subscription from ${email}`,
-        to_name: 'TechPulse Team',
-        from_name: 'TechPulse Newsletter System'
-      };
-
-      // 🚀 Send email using EmailJS
       const response = await emailjs.send(
         EMAILJS_CONFIG.serviceId,
         EMAILJS_CONFIG.templateId,
-        templateParams,
+        {
+          user_email: email,
+          user_name: email.split('@')[0],
+          subscription_date: new Date().toLocaleDateString(),
+          subscription_time: new Date().toLocaleTimeString(),
+          message: `New newsletter subscription from ${email}`,
+          to_name: 'TechPulse Team',
+          from_name: 'TechPulse Newsletter System',
+        },
         EMAILJS_CONFIG.publicKey
       );
 
-      console.log('EmailJS Response:', response);
+      if (response.status !== 200) throw new Error('Send failed');
 
-      if (response.status === 200) {
-        setSubscriptionStatus('success');
-        setEmail(''); // Clear the input
-        
-        // Auto-hide success message after 5 seconds
-        setTimeout(() => {
-          setSubscriptionStatus(null);
-        }, 5000);
-      } else {
-        throw new Error('Failed to send email');
-      }
-
-    } catch (error) {
-      console.error('EmailJS Error:', error);
-      setSubscriptionStatus('error');
-      setErrorMessage('Something went wrong. Please try again later.');
-    } finally {
-      setIsSubmitting(false);
+      setStatus('success');
+      setMessage("You're subscribed. The next weekly update will land in your inbox.");
+      setEmail('');
+      setTimeout(() => setStatus('idle'), 6000);
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      setStatus('error');
+      setMessage("We couldn't subscribe you. Check your connection and try again.");
     }
   };
 
+  const sending = status === 'sending';
+  const buttonLabel =
+    status === 'sending' ? 'Subscribing…' : status === 'success' ? 'Subscribed' : 'Subscribe';
+
   return (
-    <div className='container mt-5 mb-5'>
-      <div className="row mt-lg-5 mt-3 justify-content-center align-items-center">
-        <div className="col-lg-6 col-md-6 col-12 mt-lg-4 mt-md-3 mt-2 p-lg-4 p-md-3 p-3 text-center text-lg-start">
-          <h1 className='hero-title mb-4'>TechPulse</h1>
-          <p className='fs-lg-4 fs-md-5 fs-6 text-muted mb-4'>
-            From artificial intelligence and GenAI to software development and future tech, 
-            we pulse with the stories that matter. Stay ahead, stay inspired, and explore 
-            the ideas shaping tomorrow.
-          </p>
-          <h3 className='fs-lg-4 fs-md-5 fs-6 text-muted mb-3'>
-            Subscribe to Our Newsletter Now
-          </h3>
+    <section className="hero" aria-labelledby="hero-title">
+      <div className="hero__inner">
+        <h1 id="hero-title" className="hero__title">
+          Follow the ideas shaping what&rsquo;s next in tech.
+        </h1>
 
-          {/* 📧 Newsletter Subscription Form */}
-          <div className="newsletter-container">
-            <form ref={formRef} onSubmit={handleSubscribe}>
-              <TextField
-                id="newsletter-email"
-                label="Enter your email address"
-                variant="outlined"
-                fullWidth
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubmitting}
-                error={subscriptionStatus === 'error'}
-                helperText={subscriptionStatus === 'error' ? errorMessage : ''}
-                sx={{
-                  "& .MuiInputBase-root": {
-                    height: 50,
-                    fontSize: "1rem"
-                  },
-                  "& .MuiInputLabel-root": {
-                    fontSize: "0.9rem"
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    '&.Mui-focused fieldset': {
-                      borderColor: subscriptionStatus === 'success' ? '#28a745' : '#8A2BE2',
-                    },
-                  },
-                }}
-              />
-              
-              <div className="d-flex flex-column flex-sm-row gap-3 mt-3 align-items-center justify-content-center justify-content-lg-start">
-                <Button
-                  type="submit"
-                  className="sendButton"
-                  disabled={isSubmitting || !email.trim()}
-                  style={{
-                    background: isSubmitting ? "#6c757d" : 
-                              subscriptionStatus === 'success' ? "#28a745" : "blueviolet",
-                    color: "white",
-                    height: "50px",
-                    fontSize: "1rem",
-                    borderRadius: "50px",
-                    padding: "0 20px",
-                    minWidth: "130px",
-                    transition: "all 0.3s ease"
-                  }}
-                  endIcon={
-                    isSubmitting ? (
-                      <div className="spinner-border spinner-border-sm" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    ) : subscriptionStatus === 'success' ? (
-                      <CheckCircleIcon />
-                    ) : (
-                      <SendIcon />
-                    )
-                  }
-                >
-                  {isSubmitting ? "Subscribing..." : 
-                   subscriptionStatus === 'success' ? "Subscribed!" : "Subscribe"}
-                </Button>
-              </div>
-            </form>
+        <p className="hero__lede">
+          TechPulse publishes articles on AI, software development and the technology
+          coming next, written by people who build it.
+        </p>
 
-            {/* 🎉 Success/Error Messages */}
-            {subscriptionStatus === 'success' && (
-              <Alert variant="success" className="mt-3 text-center">
-                <CheckCircleIcon className="me-2" />
-                <strong>Welcome to TechPulse!</strong> 
-                <br />
-                You've successfully subscribed to our newsletter. 
-                Get ready for the latest tech insights!
-              </Alert>
-            )}
+        <ul className="topics" aria-label="Topics we cover">
+          {TOPICS.map((topic) => (
+            <li key={topic}>{topic}</li>
+          ))}
+        </ul>
 
-            {subscriptionStatus === 'error' && errorMessage && (
-              <Alert variant="danger" className="mt-3 text-center">
-                <strong>Oops!</strong> {errorMessage}
-              </Alert>
-            )}
-
-            {/* 📝 Privacy Notice */}
-            <p className="text-muted mt-3" style={{ fontSize: '0.85rem' }}>
-              By subscribing, you agree to receive our weekly tech updates. 
-              <br />
-            </p>
-          </div>
+        {/* Calls to action */}
+        <div className="cta-row">
+          <Link className="cta cta--primary" to="/blogs">
+            Read articles
+            <ArrowIcon />
+          </Link>
+          <a className="cta cta--secondary" href="#newsletter">
+            <span className="cta__icon">
+              <MailIcon />
+            </span>
+            Get the weekly digest
+          </a>
         </div>
-        
-        {/* 3D Animation Section (commented out) */}
-       <div className="col-lg-6 col-md-6 col-12 right text-center p-lg-4 p-md-3 p-3">
-  <img 
-    src="/heroside.svg" 
-    alt="Hero Side" 
-    className="img-fluid"
-    style={{ maxWidth: "90%", height: "auto" }} 
-  />
-</div>
 
+        {/* Preview card */}
+        <div className="preview" role="region" aria-labelledby="feed-title">
+          <div className="preview__header">
+            <h2 id="feed-title" className="preview__title">
+              <span className="preview__dot" aria-hidden="true" />
+              Latest on TechPulse
+            </h2>
+            <svg className="preview__ecg" viewBox="0 0 64 20" aria-hidden="true" focusable="false">
+              <path d="M0 10 H18 L23 10 L27 2 L33 18 L37 10 H46 L49 7 L52 10 H64" />
+            </svg>
+          </div>
+
+          <ol className="preview__list">
+            {articles.map((a) => (
+              <li key={a.id}>
+                <Link className="preview__item" to={a.to || '/blogs'}>
+                  <span className="preview__tag">{a.tag}</span>
+                  <span className="preview__headline">{a.title}</span>
+                  <span className="preview__meta">{a.readTime} min read</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+
+          <form id="newsletter" className="signup" onSubmit={handleSubscribe} noValidate>
+            <label className="signup__label" htmlFor="newsletter-email">
+              Get the weekly digest
+            </label>
+            <div className="signup__body">
+              <div className={`signup__field${status === 'error' ? ' is-error' : ''}`}>
+                <input
+                  id="newsletter-email"
+                  className="signup__input"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={sending}
+                  aria-invalid={status === 'error'}
+                  aria-describedby="signup-status"
+                />
+                <button
+                  className={`signup__button${status === 'success' ? ' is-success' : ''}`}
+                  type="submit"
+                  disabled={sending}
+                >
+                  {buttonLabel}
+                </button>
+              </div>
+              <p
+                id="signup-status"
+                className={`signup__status signup__status--${status}`}
+                role="status"
+                aria-live="polite"
+              >
+                {message}
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

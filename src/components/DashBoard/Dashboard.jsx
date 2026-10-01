@@ -33,7 +33,13 @@ export const Dashboard = forwardRef((props, ref) => {
       setLoading(true);
       setError(null);
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${encodeURIComponent(username)}/dashboard`, { withCredentials: true });
-      setData({ ...response.data, bookmarks: response.data.bookmarks || [], likedBlogs: response.data.likedBlogs || [] });
+      setData({
+        ...response.data,
+        blogs: Array.isArray(response.data.blogs) ? response.data.blogs : [],
+        comments: Array.isArray(response.data.comments) ? response.data.comments : [],
+        bookmarks: Array.isArray(response.data.bookmarks) ? response.data.bookmarks : [],
+        likedBlogs: Array.isArray(response.data.likedBlogs) ? response.data.likedBlogs : [],
+      });
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.error || err.response?.data?.message || 'Failed to load dashboard data');

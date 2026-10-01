@@ -64,7 +64,8 @@ const Blogpage = () => {
     axios
       .get(`${API}/blogs?${new URLSearchParams(Object.entries(filters).filter(([, value]) => value))}`, { withCredentials: true })
       .then((res) => {
-        setBlogs(res.data.blogs || res.data);
+        const articles = Array.isArray(res.data) ? res.data : res.data?.blogs;
+        setBlogs(Array.isArray(articles) ? articles : []);
         setStatus('ready');
       })
       .catch((err) => {
@@ -169,7 +170,7 @@ const Blogpage = () => {
                     {blog.genre && <span className="tp-card__tag">{blog.genre}</span>}
                     {blog.tags?.length > 0 && (
                       <div className="tp-card__tags" aria-label="Article tags">
-                        {blog.tags.map((tag) => <span className="tp-card__tag--small" key={tag}>#{tag}</span>)}
+                        {(Array.isArray(blog.tags) ? blog.tags : []).map((tag) => <span className="tp-card__tag--small" key={tag}>#{tag}</span>)}
                       </div>
                     )}
                     <h2 className="tp-card__title">

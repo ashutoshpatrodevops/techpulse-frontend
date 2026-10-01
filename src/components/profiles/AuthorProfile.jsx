@@ -17,7 +17,11 @@ const AuthorProfile = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/profile/${encodeURIComponent(username)}`);
-        setProfile(response.data);
+        setProfile({
+          ...response.data,
+          blogs: Array.isArray(response.data.blogs) ? response.data.blogs : [],
+          stats: response.data.stats || { articles: 0, followers: 0, following: 0 },
+        });
       } catch (err) {
         setError(err.response?.data?.error || 'Profile could not be loaded.');
       } finally {

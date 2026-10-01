@@ -16,7 +16,7 @@ const Comment = ({ blogId }) => {
     const fetchComments = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${blogId}/comments`);
-        setComments(res.data);
+        setComments(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         showFlash("Failed to load comments", "error");
       }
